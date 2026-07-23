@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>GitHub PR Tab Group — Options</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      max-width: 480px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+      color: #1f2328;
+    }
+    h1 { font-size: 1.25rem; }
+    label { display: block; margin-top: 1rem; font-weight: 600; }
+    input, select {
+      width: 100%;
+      padding: 0.4rem 0.5rem;
+      margin-top: 0.25rem;
+      box-sizing: border-box;
+      border: 1px solid #d1d9e0;
+      border-radius: 6px;
+      font-size: 0.9rem;
+    }
+    .hint { font-size: 0.8rem; color: #59636e; font-weight: 400; margin-top: 0.25rem; }
+    .buttons { margin-top: 1.5rem; display: flex; gap: 0.5rem; }
+    button {
+      padding: 0.45rem 1rem;
+      border-radius: 6px;
+      border: 1px solid #d1d9e0;
+      background: #f6f8fa;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    button.primary { background: #1f883d; border-color: #1f883d; color: #fff; }
+    #status { margin-top: 1rem; font-size: 0.85rem; min-height: 1.2em; }
+    #status.ok { color: #1a7f37; }
+    #status.error { color: #d1242f; }
+  </style>
+</head>
+<body>
+  <h1>GitHub PR Tab Group</h1>
+
+  <label for="token">
+    GitHub personal access token <em>(required)</em>
+    <div class="hint">
+      Create a <strong>classic</strong> token at github.com/settings/tokens with
+      the <code>repo</code> scope (<code>public_repo</code> if you only need
+      public repos). Stored locally in your browser only.
+    </div>
+  </label>
+  <input id="token" type="password" placeholder="ghp_…" autocomplete="off" />
+
+  <label for="pollMinutes">
+    Poll interval (minutes)
+    <div class="hint">Minimum 0.5 (Chrome alarms can't fire more often than every 30s).</div>
+  </label>
+  <input id="pollMinutes" type="number" min="0.5" step="0.5" />
+
+  <label for="groupTitle">
+    Tab group title
+    <div class="hint">The open-PR count is appended automatically, e.g. "🔀 My PRs (7)".</div>
+  </label>
+  <input id="groupTitle" type="text" />
+
+  <label for="groupColor">Tab group color</label>
+  <select id="groupColor">
+    <option>grey</option><option>blue</option><option>red</option>
+    <option>yellow</option><option>green</option><option>pink</option>
+    <option>purple</option><option>cyan</option><option>orange</option>
+  </select>
+
+  <label for="reviewGroupTitle">
+    Review-requests group title
+    <div class="hint">
+      PRs where you're personally requested as a reviewer (by name, not via a
+      team). The tab disappears once you submit a review.
+    </div>
+  </label>
+  <input id="reviewGroupTitle" type="text" />
+
+  <label for="reviewGroupColor">Review-requests group color</label>
+  <select id="reviewGroupColor">
+    <option>grey</option><option>blue</option><option>red</option>
+    <option>yellow</option><option>green</option><option>pink</option>
+    <option>purple</option><option>cyan</option><option>orange</option>
+  </select>
+
+  <div class="buttons">
+    <button id="save" class="primary">Save</button>
+    <button id="sync">Sync now</button>
+  </div>
+  <div id="status"></div>
+
+  <h2 style="font-size: 1rem; margin-top: 2rem;">Last sync</h2>
+  <pre id="report" style="background: #f6f8fa; border: 1px solid #d1d9e0; border-radius: 6px; padding: 0.75rem; font-size: 0.8rem; white-space: pre-wrap; word-break: break-all;">(no sync has run yet)</pre>
+
+  <script src="options.js"></script>
+</body>
+</html>
