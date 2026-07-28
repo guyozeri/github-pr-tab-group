@@ -78,3 +78,27 @@ if a sync fails (hover the icon for the error).
 - `scripting` + host access to `https://github.com/*` — injects the
   duplicate-PR banner into PR pages.
 - Host access to `https://api.github.com/*` — the PR fetch.
+
+## Releasing
+
+Publishing to the Chrome Web Store is automated by
+[`.github/workflows/release.yml`](.github/workflows/release.yml). To ship a
+new version:
+
+1. Bump `version` in `manifest.json`.
+2. Create a GitHub release with a matching tag (e.g. `v1.4.0` for version
+   `1.4.0`). The workflow packages the extension, uploads it to the Chrome
+   Web Store, publishes it, and attaches the zip to the release.
+
+The workflow needs four repository secrets (Settings → Secrets and variables →
+Actions):
+
+- `CHROME_EXTENSION_ID` — the extension's ID from the Web Store developer
+  dashboard.
+- `CHROME_CLIENT_ID`, `CHROME_CLIENT_SECRET` — an OAuth client from a Google
+  Cloud project with the **Chrome Web Store API** enabled.
+- `CHROME_REFRESH_TOKEN` — a refresh token for that client, authorized with
+  the `https://www.googleapis.com/auth/chromewebstore` scope.
+
+See the [chrome-webstore-upload setup guide](https://github.com/fregante/chrome-webstore-upload-keys)
+for a step-by-step walkthrough of obtaining these credentials.
