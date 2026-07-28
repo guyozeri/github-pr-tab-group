@@ -162,7 +162,18 @@ async function fetchOpenPrUrlsViaApi(token, query) {
     }
   );
   if (res.status === 401) {
-    throw new Error("GitHub rejected the token (401) — check it in Options");
+    throw new Error(
+      "GitHub rejected the token (401) — check it in Options (it may have expired)"
+    );
+  }
+  if (res.status === 403) {
+    // Typical for a fine-grained token missing the Pull requests: Read
+    // permission (classic tokens with bad scopes usually 401 or return
+    // filtered results instead).
+    throw new Error(
+      "GitHub refused the request (403) — if you use a fine-grained token, " +
+        "make sure it has the 'Pull requests: Read-only' permission"
+    );
   }
   if (!res.ok) {
     throw new Error(`GitHub API returned ${res.status} ${res.statusText}`);

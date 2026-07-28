@@ -30,13 +30,27 @@ review:
 
 ## Setup
 
-The extension uses the GitHub REST API and needs a personal access token:
+The extension uses the GitHub REST API and needs a personal access token.
+Both token kinds work:
 
-1. Create a **classic** token at <https://github.com/settings/tokens/new> with
-   the `repo` scope (`public_repo` if you only need public repos). No expiry
-   or a long expiry is fine — it's stored only in your browser.
-2. Right-click the extension icon → **Options** (or **Details → Extension
-   options** on `chrome://extensions`), paste the token, and **Save**.
+- **Fine-grained** (recommended): create one at
+  <https://github.com/settings/personal-access-tokens/new> with
+  - **Repository access**: the repositories (or "All repositories") whose PRs
+    should show up — PRs in repos the token can't see are silently excluded
+    from the search results;
+  - **Permissions → Pull requests: Read-only** (Metadata: Read-only is added
+    automatically).
+  - If your PRs live in an organization, pick that org as the **Resource
+    owner** — the org may need to approve fine-grained tokens.
+- **Classic**: create one at <https://github.com/settings/tokens/new> with the
+  `repo` scope (`public_repo` if you only need public repos).
+
+Fine-grained tokens always expire (1 year max), so you'll need to renew
+periodically; a classic token can be non-expiring. Either way the token is
+stored only in your browser.
+
+Then right-click the extension icon → **Options** (or **Details → Extension
+options** on `chrome://extensions`), paste the token, and **Save**.
 
 Options also let you change the poll interval and the group's title/color, and
 show a **Last sync** report (mode, PR count, tabs opened/closed, errors). The
