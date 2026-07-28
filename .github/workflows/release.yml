@@ -1,0 +1,51 @@
+name: Release to Chrome Web Store
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check manifest version matches release tag
+        if: github.event_name == 'release'
+        run: |
+          MANIFEST_VERSION=$(jq -r .version manifest.json)
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          if [ "$MANIFEST_VERSION" != "$TAG_VERSION" ]; then
+            echo "manifest.json version ($MANIFEST_VERSION) does not match release tag ($TAG_VERSION)" >&2
+            exit 1
+          fi
+
+      - name: Package extension
+        run: |
+          zip extension.zip \
+            manifest.json \
+            background.js \
+            options.html \
+            options.js \
+            icon16.png icon32.png icon48.png icon128.png
+
+      - name: Upload and publish to Chrome Web Store
+        run: |
+          npx --yes chrome-webstore-upload-cli@3 upload \
+            --source extension.zip \
+            --auto-publish
+        env:
+          EXTENSION_ID: ${{ secrets.CHROME_EXTENSION_ID }}
+          CLIENT_ID: ${{ secrets.CHROME_CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.CHROME_CLIENT_SECRET }}
+          REFRESH_TOKEN: ${{ secrets.CHROME_REFRESH_TOKEN }}
+
+      - name: Attach zip to GitHub release
+        if: github.event_name == 'release'
+        run: gh release upload "$GITHUB_REF_NAME" extension.zip --clobber
+        env:
+          GH_TOKEN: ${{ github.token }}
