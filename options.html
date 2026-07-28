@@ -44,12 +44,16 @@
   <label for="token">
     GitHub personal access token <em>(required)</em>
     <div class="hint">
-      Create a <strong>classic</strong> token at github.com/settings/tokens with
-      the <code>repo</code> scope (<code>public_repo</code> if you only need
-      public repos). Stored locally in your browser only.
+      Create one at github.com/settings/tokens. Either kind works:
+      a <strong>fine-grained</strong> token (<code>github_pat_…</code>) with
+      <em>Pull requests: Read-only</em> permission and access to the
+      repositories you care about, or a <strong>classic</strong> token
+      (<code>ghp_…</code>) with the <code>repo</code> scope
+      (<code>public_repo</code> for public repos only). Stored locally in
+      your browser only.
     </div>
   </label>
-  <input id="token" type="password" placeholder="ghp_…" autocomplete="off" />
+  <input id="token" type="password" placeholder="github_pat_… or ghp_…" autocomplete="off" />
 
   <label for="pollMinutes">
     Poll interval (minutes)
