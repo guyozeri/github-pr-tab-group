@@ -7,6 +7,7 @@ const DEFAULT_SETTINGS = {
   groupColor: "blue",
   reviewGroupTitle: "👀 Reviews",
   reviewGroupColor: "orange",
+  maxTabsPerGroup: 0, // 0 = no limit
 };
 
 // The managed tab groups. Each one is kept in sync with a GitHub search:
@@ -108,14 +109,24 @@ async function sync() {
     const managedState = await getManagedState();
     const counts = {};
     for (const cfg of groupConfigs(settings)) {
-      const prUrls = await fetchOpenPrUrlsViaApi(settings.token, cfg.query);
-      const stats = await reconcileTabs(prUrls, cfg, managedState);
+      const allPrUrls = await fetchOpenPrUrlsViaApi(settings.token, cfg.query);
+      // Results are sorted most-recently-updated first, so the limit keeps
+      // the PRs with the freshest activity; the rest get no tab (and any
+      // existing tab for them is closed like a stale one).
+      const limit = Math.max(0, Math.floor(Number(settings.maxTabsPerGroup) || 0));
+      const prUrls = limit > 0 ? allPrUrls.slice(0, limit) : allPrUrls;
+      const stats = await reconcileTabs(prUrls, cfg, managedState, allPrUrls.length);
       managedState[cfg.kind] = {
         groupId: stats.groupId,
         keys: prUrls.map(prKey).filter(Boolean),
       };
-      counts[cfg.kind] = prUrls.length;
-      report[cfg.kind] = { prCount: prUrls.length, samplePrs: prUrls.slice(0, 5), ...stats };
+      counts[cfg.kind] = allPrUrls.length;
+      report[cfg.kind] = {
+        prCount: allPrUrls.length,
+        tabbedPrCount: prUrls.length,
+        samplePrs: prUrls.slice(0, 5),
+        ...stats,
+      };
     }
     await chrome.storage.local.set({ managedState });
     report.ok = true;
@@ -152,7 +163,7 @@ async function setBadge(text, color, title) {
 
 async function fetchOpenPrUrlsViaApi(token, query) {
   const res = await fetch(
-    `https://api.github.com/search/issues?q=${encodeURIComponent(query)}&per_page=100`,
+    `https://api.github.com/search/issues?q=${encodeURIComponent(query)}&sort=updated&order=desc&per_page=100`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -343,7 +354,7 @@ async function findGroup(cfg, managedState) {
   return groups.find((g) => (g.title || "").startsWith(cfg.title)) || null;
 }
 
-async function reconcileTabs(prUrls, cfg, managedState) {
+async function reconcileTabs(prUrls, cfg, managedState, totalPrCount = prUrls.length) {
   const stats = { tabsClosed: 0, tabsOpened: 0, tabsAdopted: 0, groupId: null };
   const openPrs = new Map(); // key -> canonical PR url
   for (const url of prUrls) {
@@ -352,7 +363,11 @@ async function reconcileTabs(prUrls, cfg, managedState) {
   }
 
   let group = await findGroup(cfg, managedState);
-  const liveTitle = `${cfg.title} (${openPrs.size})`;
+  // When the tab limit hides some PRs, show "(shown/total)".
+  const liveTitle =
+    totalPrCount > openPrs.size
+      ? `${cfg.title} (${openPrs.size}/${totalPrCount})`
+      : `${cfg.title} (${openPrs.size})`;
   console.log(
     `[pr-sync] [${cfg.kind}] ${openPrs.size} open PR(s); existing group:`,
     group ? group.id : "none"

@@ -52,7 +52,9 @@ stored only in your browser.
 Then right-click the extension icon → **Options** (or **Details → Extension
 options** on `chrome://extensions`), paste the token, and **Save**.
 
-Options also let you change the poll interval and the group's title/color, and
+Options also let you change the poll interval and the group's title/color, cap
+the number of PR tabs per group (only the most recently updated PRs get a tab;
+the title then reads e.g. "🔀 My PRs (10/14)"), and
 show a **Last sync** report (mode, PR count, tabs opened/closed, errors). The
 toolbar icon badge shows the number of open PRs after each sync, or a red `!`
 if a sync fails (hover the icon for the error).
