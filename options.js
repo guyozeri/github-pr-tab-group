@@ -5,6 +5,7 @@ const DEFAULT_SETTINGS = {
   groupColor: "blue",
   reviewGroupTitle: "👀 Reviews",
   reviewGroupColor: "orange",
+  maxTabsPerGroup: 0, // 0 = no limit
 };
 
 const $ = (id) => document.getElementById(id);
@@ -23,6 +24,7 @@ async function load() {
   $("groupColor").value = settings.groupColor;
   $("reviewGroupTitle").value = settings.reviewGroupTitle;
   $("reviewGroupColor").value = settings.reviewGroupColor;
+  $("maxTabsPerGroup").value = settings.maxTabsPerGroup;
 }
 
 async function save() {
@@ -34,6 +36,7 @@ async function save() {
     reviewGroupTitle:
       $("reviewGroupTitle").value.trim() || DEFAULT_SETTINGS.reviewGroupTitle,
     reviewGroupColor: $("reviewGroupColor").value,
+    maxTabsPerGroup: Math.max(0, Math.floor(Number($("maxTabsPerGroup").value) || 0)),
   };
   await chrome.storage.local.set(settings);
   await chrome.runtime.sendMessage({ type: "settings-changed" });

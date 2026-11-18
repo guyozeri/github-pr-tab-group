@@ -61,6 +61,15 @@
   </label>
   <input id="pollMinutes" type="number" min="0.5" step="0.5" />
 
+  <label for="maxTabsPerGroup">
+    Max PR tabs per group
+    <div class="hint">
+      0 = no limit. If a group has more open PRs than this, only the most
+      recently updated ones get a tab, and the title shows e.g. "(10/14)".
+    </div>
+  </label>
+  <input id="maxTabsPerGroup" type="number" min="0" step="1" />
+
   <label for="groupTitle">
     Tab group title
     <div class="hint">The open-PR count is appended automatically, e.g. "🔀 My PRs (7)".</div>
